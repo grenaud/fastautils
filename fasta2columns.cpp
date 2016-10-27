@@ -16,14 +16,17 @@ using namespace std;
 int main (int argc, char *argv[]) {
 
     bool printIndex=false;
+    bool printIndexRef=false;
     bool printOnlyDiff=false;
     int index1=-1;
     int index2=-1;
-
+    int indexR=-1;
+    
     if(argc==1){
 	cerr<<"Usage "<<argv[0]<<" <options> [fasta file]"<<endl;
 	cerr<<"Options:"<<endl;
 	cerr<<"\t-ind\t\t\t\tPrint 1-based index "<<endl;
+	cerr<<"\t-inds [seq X]\t\t\t\tPrint 1-based index using sequence X as the reference "<<endl;
 	cerr<<"\t-diff [seq X] [seq Y]\t\tPrint only lines that differ between sequence X and Y (1-based)"<<endl;	
 	return 1;
     }
@@ -31,7 +34,14 @@ int main (int argc, char *argv[]) {
     
     for(int i=1;i<(argc-1);i++){ //all but the last arg
 
-	if(string(argv[i]) == "-ind" ){
+	if(string(argv[i]) == "-inds" ){
+	    printIndexRef = true;
+	    indexR        = destringify<int>(string(argv[i+1]));
+	    i++;
+	    continue;
+	}
+
+	if(string(argv[i]) == "-inds" ){
 	    printIndex=true;
 	    continue;
 	}
@@ -45,6 +55,11 @@ int main (int argc, char *argv[]) {
 	}
        
 	cerr<<"Unknown option "<<argv[i] <<" exiting"<<endl;
+	return 1;
+    }
+
+    if(printIndex && printIndexRef){
+	cerr<<"Cannot use both -ind and -inds"<<endl;
 	return 1;
     }
 
@@ -69,13 +84,34 @@ int main (int argc, char *argv[]) {
 	    return 1;
 	}
     }
-    
+
+    unsigned int indexUsingRef=0;
+
     if(!printOnlyDiff){
+
+	if(printIndexRef){
+	    if( indexR<1 ){
+		cerr<<"Wrong -inds option, reference index greater than 1"<<endl;
+		return 1;
+	    }
+
+	    if( (indexR>int(toprint.size())) ){
+		cerr<<"Wrong -inds option, it must be a sequence index lesser than the number of sequences"<<endl;
+		return 1;
+	    }
+	}
+
 	for(unsigned int l=0;l<length;l++){	
 	    if(printIndex){
 		cout<<(l+1)<<"\t";
 	    }
 
+	    if(printIndexRef){
+		if(toprint[indexR-1][l] != '-')//not gap
+		    indexUsingRef++;
+		cout<<(indexUsingRef)<<"\t";
+	    }
+	    
 	    for(unsigned int i=0;i<toprint.size();i++){
 		cout<<toprint[i][l];
 	    }
@@ -97,13 +133,35 @@ int main (int argc, char *argv[]) {
 	    return 1;
 	}
 
+	if(printIndexRef){
+	    if( indexR<1 ){
+		cerr<<"Wrong -inds option, reference index greater than 1"<<endl;
+		return 1;
+	    }
+
+	    if( (indexR>int(toprint.size())) ){
+		cerr<<"Wrong -inds option, it must be a sequence index lesser than the number of sequences"<<endl;
+		return 1;
+	    }
+	}
+
 	for(unsigned int l=0;l<length;l++){	
+	    if(printIndexRef){
+		if(toprint[indexR-1][l] != '-')//not gap
+		    indexUsingRef++;
+	    }
+
 	    if(toprint[index1-1][l]  == toprint[index2-1][l]  )
 		continue;
+
+	    if(printIndexRef){
+		cout<<(indexUsingRef)<<"\t";
+	    }
 
 	    if(printIndex){
 		cout<<(l+1)<<"\t";
 	    }
+	    
 
 	    for(unsigned int i=0;i<toprint.size();i++){
 		cout<<toprint[i][l];
