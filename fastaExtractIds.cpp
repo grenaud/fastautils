@@ -15,6 +15,7 @@
 using namespace std;
 
 int main (int argc, char *argv[]) {
+    bool trimSpace=false;
     bool notInList=false;
 
     string usage=string(""+string(argv[0])+" (options) [ID file] [fasta file] "+
@@ -24,7 +25,9 @@ int main (int argc, char *argv[]) {
 			"\t>id2\n"+
 			"\t...\n"+
 			"Options:\n"+
-			"\t"+"-v\t:  (Default: "+booleanAsString(notInList)+")\n"+
+			"\t"+"-v\t: Print those NOT in list (Default: "+booleanAsString(notInList)+")\n"+
+			"\t"+"-s\t: Trim ignore everything after the first space (Default: "+booleanAsString(trimSpace)+")\n"+
+
 			"\n");
 
     if(argc == 1 ||
@@ -42,6 +45,13 @@ int main (int argc, char *argv[]) {
 	    notInList = true;
             continue;
 	}
+
+        if(string(argv[i]) == "-s"){
+	    trimSpace = true;
+            continue;
+	}
+
+
 
     }
 
@@ -70,11 +80,18 @@ int main (int argc, char *argv[]) {
     while(fqp.hasData()){
     	FastQObj * test	=fqp.getData();
 	//cout<<*(test)<<endl;
+	string idToUse=*(test->getID());
+	if(trimSpace){
+	    size_t pos = idToUse.find_first_of(" ");
+	    if(pos!=string::npos){
+		idToUse=idToUse.substr(0,pos);
+	    }
+	}
 	if(notInList){
-	    if( !( idsToExtract.find( *(test->getID()) ) != idsToExtract.end() ))
+	    if( !( idsToExtract.find( idToUse ) != idsToExtract.end() ))
 		cout<<*(test->getID())<<endl<<*(test->getSeq())<<endl;
 	}else{
-	    if( idsToExtract.find( *(test->getID()) ) != idsToExtract.end() )
+	    if( idsToExtract.find( idToUse ) != idsToExtract.end() )
 		cout<<*(test->getID())<<endl<<*(test->getSeq())<<endl;
 	}
     	// cout<<*(test->getQual())<<endl;
