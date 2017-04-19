@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -lm -O3 -lz -I${LIBGAB}/ -I${LIBGAB}/gzstream/  -c
 LDFLAGS  = -lz
 
 
-all:  allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed
+all:  allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases
 
 allSubstrFasta.o:	allSubstrFasta.cpp
 	${CXX} ${CXXFLAGS} allSubstrFasta.cpp
@@ -34,6 +34,9 @@ fastalinebreak.o:	fastalinebreak.cpp
 
 fastaDiffs2bed.o:	fastaDiffs2bed.cpp
 	${CXX} ${CXXFLAGS} fastaDiffs2bed.cpp
+
+fastaUnresolvedBases.o:	fastaUnresolvedBases.cpp
+	${CXX} ${CXXFLAGS} fastaUnresolvedBases.cpp
 
 
 allSubstrFasta:	allSubstrFasta.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
@@ -63,7 +66,10 @@ fastalinebreak:	fastalinebreak.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LI
 fastaDiffs2bed:	fastaDiffs2bed.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
+fastaUnresolvedBases:	fastaUnresolvedBases.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
+
 
 clean :
-	rm -f *.o allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed
+	rm -f *.o allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases
 
