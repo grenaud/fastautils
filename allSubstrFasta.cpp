@@ -23,7 +23,7 @@
 #include "FastQParser.h"
 #include "FastQObj.h"
 
-#include "utils.h"
+#include "libgab.h"
 
 using namespace std;
 

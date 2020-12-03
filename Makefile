@@ -6,7 +6,22 @@ CXXFLAGS = -Wall -lm -O3 -lz -I${LIBGAB}/ -I${LIBGAB}/gzstream/  -c
 LDFLAGS  = -lz
 
 
-all:  allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases fastaUnresolvedBases2Bed
+all:  libgab/libgab.a bamtools/lib/libbamtools.so allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases
+
+libgab/libgab.h:
+	rm -rf libgab/
+	git clone --depth 1 --recursive https://github.com/grenaud/libgab.git
+
+libgab/libgab.a: bamtools/lib/libbamtools.so  libgab/libgab.h
+	make -C libgab
+
+bamtools/src/api/BamAlignment.h:
+	rm -rf bamtools/
+	git clone  --recursive https://github.com/pezmaster31/bamtools.git && cd bamtools/ && git reset --hard d24d850de17134fe4e7984b26493c5c0a1844b35
+
+bamtools/lib/libbamtools.so: bamtools/src/api/BamAlignment.h
+	cd bamtools/ && mkdir -p build/  && cd build/ && if cmake ..; then echo ""; else if cmake3 ..; then echo ""; else echo "cmake failed, please install cmake v3"; fi  fi  && make && cd ../..
+
 
 allSubstrFasta.o:	allSubstrFasta.cpp
 	${CXX} ${CXXFLAGS} allSubstrFasta.cpp
@@ -38,43 +53,38 @@ fastaDiffs2bed.o:	fastaDiffs2bed.cpp
 fastaUnresolvedBases.o:	fastaUnresolvedBases.cpp
 	${CXX} ${CXXFLAGS} fastaUnresolvedBases.cpp
 
-fastaUnresolvedBases2Bed.o: fastaUnresolvedBases2Bed.cpp
-	${CXX} ${CXXFLAGS} fastaUnresolvedBases2Bed.cpp
-
-allSubstrFasta:	allSubstrFasta.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+allSubstrFasta:	allSubstrFasta.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fasta2columns:	fasta2columns.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fasta2columns:	fasta2columns.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fasta2dist:	fasta2dist.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fasta2dist:	fasta2dist.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fasta2oneLine:	fasta2oneLine.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fasta2oneLine:	fasta2oneLine.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastacat:	fastacat.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastacat:	fastacat.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastacatSubstr:	fastacatSubstr.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastacatSubstr:	fastacatSubstr.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastaExtractIds:	fastaExtractIds.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastaExtractIds:	fastaExtractIds.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastalinebreak:	fastalinebreak.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastalinebreak:	fastalinebreak.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastaDiffs2bed:	fastaDiffs2bed.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastaDiffs2bed:	fastaDiffs2bed.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastaUnresolvedBases: fastaUnresolvedBases.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
+fastaUnresolvedBases: fastaUnresolvedBases.o ${LIBGAB}/libgab.a  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
-fastaUnresolvedBases2Bed: fastaUnresolvedBases2Bed.o ${LIBGAB}/utils.o  ${LIBGAB}/FastQParser.o ${LIBGAB}/gzstream/libgzstream.a ${LIBGAB}/FastQObj.o
-	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
 
 clean :
-	rm -f *.o allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases fastaUnresolvedBases2Bed
+	rm -f *.o allSubstrFasta fasta2columns fasta2dist fasta2oneLine fastacat fastacatSubstr fastaExtractIds fastalinebreak fastaDiffs2bed fastaUnresolvedBases 
 

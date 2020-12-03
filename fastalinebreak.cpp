@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "FastQParser.h"
-#include "utils.h"
+#include "libgab.h"
 #define LINESIZE 80
 
 using namespace std;

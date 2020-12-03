@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include "FastQParser.h"
-#include "utils.h"
+#include "libgab.h"
 
 using namespace std;
 
